@@ -112,6 +112,7 @@ div.content{
     flex-direction: column;
     width: 60%;
     margin-left: 5px;
+    margin-right: 10%;
 }
 button.delete{
     background-color: red;
@@ -119,6 +120,9 @@ button.delete{
     height: fit-content;
     padding: 10px;
     font-size: 15px;
+    margin-top: 45%;
     color: white;
-    margin-top: 7%;
+    vertical-align: center;
+}
+div.deleteBtnDiv{
 }

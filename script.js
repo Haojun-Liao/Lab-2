@@ -33,6 +33,7 @@ function addedArtist(){
     let artistName = document.createElement("h3");
     let artistDes = document.createElement("p");
     let icon = document.createElement("img");
+    let btnDiv = document.createElement("div");
 
     cell.className = "cell";
     artistName.textContent = name;
@@ -43,6 +44,7 @@ function addedArtist(){
     textContent.className = "content";
     deletebtn.className = "delete";
     deletebtn.textContent = "delete";
+    btnDiv.className = "deleteBtnDiv";
     icon.setAttribute("src", url);
 
     localStorage.setItem("artist-list", JSON.stringify(artistList));
@@ -83,8 +85,11 @@ function deleteArtist(deletebtn){
     }
 }
 function search(){
-    var a = document.getElementById("search").value.toUpperCase();
     var list = JSON.parse(localStorage.getItem("artist-list"));
+    if (list === null){
+        return;
+    }
+    var a = document.getElementById("search").value.toUpperCase();
     var cell = document.getElementsByClassName("cell");
 
     for(let i=0; i<list.length; i++){
@@ -115,6 +120,7 @@ function loadArtist(name, des, url){
     let artistName = document.createElement("h3");
     let artistDes = document.createElement("p");
     let icon = document.createElement("img");
+    let btnDiv = document.createElement("div");
 
     cell.className = "cell";
     artistName.textContent = name;
@@ -125,13 +131,15 @@ function loadArtist(name, des, url){
     textContent.className = "content";
     deletebtn.className = "delete";
     deletebtn.textContent = "delete";
+    btnDiv.className = "deleteBtnDiv";
     icon.setAttribute("src", url);
 
+    btnDiv.appendChild(deletebtn);
     cell.appendChild(icon);
     textContent.appendChild(artistName);
     textContent.appendChild(artistDes);
     cell.appendChild(textContent);
-    cell.appendChild(deletebtn);
+    cell.appendChild(btnDiv);
     list.appendChild(cell);
     deletebtn.onclick = (e) => {
         deleteArtist(deletebtn);
