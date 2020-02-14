@@ -65,8 +65,7 @@ function addedArtist(){
 }
 
 function deleteArtist(deletebtn){
-    let parent = deletebtn.parentNode;
-    console.log(parent.childNodes);
+    let parent = deletebtn.parentNode.parentNode;
     for (var i = 0; i < parent.childNodes.length; i++){
         if (parent.childNodes[i].className == "content"){
             var delName = parent.children[i].children[0].textContent;
@@ -79,10 +78,10 @@ function deleteArtist(deletebtn){
                 }
             }
             localStorage.setItem("artist-list", JSON.stringify(list));
-            deletebtn.parentNode.parentNode.removeChild(deletebtn.parentNode);
             break
         }
     }
+    parent.remove();
 }
 function search(){
     var list = JSON.parse(localStorage.getItem("artist-list"));
@@ -143,7 +142,6 @@ function loadArtist(name, des, url){
     list.appendChild(cell);
     deletebtn.onclick = (e) => {
         deleteArtist(deletebtn);
-        location.reload();
     }
 }
 
