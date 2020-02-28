@@ -1,6 +1,5 @@
 var artistList = [];
-// localStorage.clear();
-loadStorage();
+loadFromFile();
 
 function addArtist() {
 let addArtistbtn = document.querySelector("#add-artist");
@@ -18,13 +17,11 @@ function addedArtist(){
     let name = document.querySelector("#name").value;
     let des = document.querySelector("#description").value;
     let url = document.querySelector("#url").value;
-
+    var obj = {"name" : name, "description" : des, "link": url};
     if(checkExistArtist(name)){
         window.alert("The artist exists in the dictionary.");
         return;
     }
-
-    artistList.push({"name" : name, "description" : des, "link": url});
 
     let cell = document.createElement("div");
     let list = document.getElementById("list");
@@ -47,68 +44,41 @@ function addedArtist(){
     btnDiv.className = "deleteBtnDiv";
     icon.setAttribute("src", url);
 
-    localStorage.setItem("artist-list", JSON.stringify(artistList));
+    addToFile(obj);
 
     location.reload();
-
-    // cell.appendChild(icon);
-    // textContent.appendChild(artistName);
-    // textContent.appendChild(artistDes);
-    // cell.appendChild(textContent);
-    // cell.appendChild(deletebtn);
-    // list.appendChild(cell);
-    // deletebtn.onclick = (e) => {
-    //     deleteArtist(deletebtn);
-    // }
-
     
 }
 
 function deleteArtist(deletebtn){
-    let parent = deletebtn.parentNode.parentNode;
-    for (var i = 0; i < parent.childNodes.length; i++){
-        if (parent.childNodes[i].className == "content"){
-            var delName = parent.children[i].children[0].textContent;
-            var list = JSON.parse(localStorage.getItem("artist-list"));
-            for(let i=0; i<list.length; i++){
-                console.log(list[i]);
-                if (list[i].name == delName){
-                    list.splice(i,1);
-                    break;
+    let obj = deletebtn.parentNode.parentNode;
+    console.log(obj);
+    let target = {"name": obj.children[1].children[0].textContent,
+                            "description": obj.children[1].children[1].textContent,
+                            "link": obj.children[0].src
                 }
-            }
-            localStorage.setItem("artist-list", JSON.stringify(list));
-            break
-        }
-    }
-    parent.remove();
+    deleteFromFile(target);
+    location.reload()
 }
 function search(){
-    var list = JSON.parse(localStorage.getItem("artist-list"));
-    if (list === null){
-        return;
-    }
     var a = document.getElementById("search").value.toUpperCase();
     var cell = document.getElementsByClassName("cell");
-
-    for(let i=0; i<list.length; i++){
-        if(!list[i].name.toUpperCase().includes(a)){
-            cell[i].style.display = "none";
-        } else {
-            cell[i].style.display = "flex";
-        }
+    while(cell.length>0){
+        cell[0].remove();
     }
+    findArtist(a);
 }
-
-function loadStorage(){
-    if (localStorage.getItem("artist-list") == null)
-        return;
-    let list = localStorage.getItem("artist-list");
-    artistList = JSON.parse(list);
-    artistList.forEach(function(a){
-        loadArtist(a["name"], a["description"], a["link"]);
-    }
-    )
+function findArtist(string){
+    fetch("/search").
+    then((res)=>{
+        return res.json();
+    }).then((data)=>{
+        data.forEach((obj)=>{
+            if (obj.name.toUpperCase().includes(string)){
+            loadArtist(obj.name, obj.description, obj.link);
+            }
+        });
+    })
 }
 
 function loadArtist(name, des, url){
@@ -118,7 +88,7 @@ function loadArtist(name, des, url){
     let deletebtn = document.createElement("button");
     let artistName = document.createElement("h3");
     let artistDes = document.createElement("p");
-    let icon = document.createElement("img");
+    var icon = document.createElement("img");
     let btnDiv = document.createElement("div");
 
     cell.className = "cell";
@@ -131,7 +101,7 @@ function loadArtist(name, des, url){
     deletebtn.className = "delete";
     deletebtn.textContent = "delete";
     btnDiv.className = "deleteBtnDiv";
-    icon.setAttribute("src", url);
+    icon.src = url;
 
     btnDiv.appendChild(deletebtn);
     cell.appendChild(icon);
@@ -153,4 +123,38 @@ function checkExistArtist(name){
         }
     }
     return false;
+}
+function loadFromFile(){
+    fetch('/load')
+    .then((res)=>{
+        return res.json();
+    }).then((data)=>{
+        data.forEach((obj)=>{
+            loadArtist(obj.name, obj.description, obj.link);
+        })
+    }) 
+}
+
+function addToFile(obj){
+    fetch("/add", {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(obj)
+       })
+       .then((response) => console.log(response))
+       .catch((err) => console.log(err))
+}
+
+function deleteFromFile(obj){
+    fetch("/delete", {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(obj)
+       })
+       .then((response) => console.log(response))
+       .catch((err) => console.log(err))
 }
